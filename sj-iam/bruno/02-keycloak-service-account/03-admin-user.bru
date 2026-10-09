@@ -1,0 +1,34 @@
+meta {
+  name: 03 Admin API (SA): utilizador
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{keycloak}}/admin/realms/{{realm}}/users?username={{username}}&exact=true
+  body: none
+  auth: bearer
+}
+
+params:query {
+  username: {{username}}
+  exact: true
+}
+
+auth:bearer {
+  token: {{saToken}}
+}
+
+vars:post-response {
+  userId: res.body[0].id
+}
+
+assert {
+  res.status: eq 200
+  res.body: length 1
+  res.body[0].username: eq {{username}}
+}
+
+docs {
+  Precisa de `query-users` / `view-users`. Guarda `userId`.
+}

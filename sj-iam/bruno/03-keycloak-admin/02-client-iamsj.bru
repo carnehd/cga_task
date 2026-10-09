@@ -1,0 +1,57 @@
+meta {
+  name: 02 Cliente iamsj
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{keycloak}}/admin/realms/{{realm}}/clients?clientId={{clientId}}
+  body: none
+  auth: bearer
+}
+
+params:query {
+  clientId: {{clientId}}
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+vars:post-response {
+  iamsjClientUuid: res.body[0].id
+}
+
+assert {
+  res.status: eq 200
+  res.body[0].clientId: eq {{clientId}}
+  res.body[0].publicClient: eq false
+  res.body[0].clientAuthenticatorType: eq client-jwt
+  res.body[0].serviceAccountsEnabled: eq true
+  res.body[0].standardFlowEnabled: eq false
+  res.body[0].implicitFlowEnabled: eq false
+  res.body[0].directAccessGrantsEnabled: eq false
+  res.body[0].fullScopeAllowed: eq false
+}
+
+tests {
+  test("Keys: Use JWKS URL com o endpoint do sj-iam", function () {
+    const attrs = res.body[0].attributes;
+    expect(attrs["use.jwks.url"]).to.equal("true");
+    expect(attrs["jwks.url"]).to.contain("/.well-known/jwks.json");
+  });
+  test("Credentials: Signed Jwt com RS256", function () {
+    expect(res.body[0].attributes["token.endpoint.auth.signing.alg"]).to.equal("RS256");
+  });
+  test("OAuth 2.0 Device Authorization Grant ON", function () {
+    expect(res.body[0].attributes["oauth2.device.authorization.grant.enabled"]).to.equal("true");
+  });
+}
+
+docs {
+  Mapa com a tarefa 2:
+  - Client authentication ON → `publicClient: false`
+  - Credentials: Signed Jwt → `clientAuthenticatorType: client-jwt`
+  - Keys: Use JWKS URL → `attributes["use.jwks.url"]` / `attributes["jwks.url"]`
+  - Standard flow / Direct access grants OFF, Service accounts ON, Device grant ON
+}

@@ -1,0 +1,12 @@
+{
+  "version": "1",
+  "name": "sj-iam",
+  "type": "collection",
+  "ignore": ["node_modules", ".git"],
+  "scripts": {
+    "moduleWhitelist": ["crypto", "fs", "path"],
+    "filesystemAccess": {
+      "allow": true
+    }
+  }
+}

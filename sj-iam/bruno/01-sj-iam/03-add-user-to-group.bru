@@ -1,0 +1,24 @@
+meta {
+  name: Associar utilizador a grupo (tarefa 3)
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{sjiam}}/api/users/{{username}}/groups/{{group}}
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 204
+}
+
+docs {
+  Obriga o sj-iam a autenticar-se no Keycloak com `client_credentials` + `private_key_jwt`
+  (se ainda não tiver token em cache) e a chamar a Admin API:
+  `PUT /admin/realms/CGA/users/{id}/groups/{groupId}`.
+  
+  No log do sj-iam aparece "Access token da service account 'iamsj' obtido" na primeira
+  chamada; nas seguintes, durante ~5 minutos, o token é reutilizado.
+}

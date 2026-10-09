@@ -1,0 +1,26 @@
+meta {
+  name: 06 Admin API (SA): grupos do utilizador
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{keycloak}}/admin/realms/{{realm}}/users/{{userId}}/groups
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{saToken}}
+}
+
+assert {
+  res.status: eq 200
+  res.body: isArray
+}
+
+tests {
+  test("o utilizador está no grupo " + bru.getEnvVar("group"), function () {
+    expect(res.body.map(g => g.name)).to.include(bru.getEnvVar("group"));
+  });
+}

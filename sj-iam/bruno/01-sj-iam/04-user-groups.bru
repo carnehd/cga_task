@@ -1,0 +1,22 @@
+meta {
+  name: Grupos do utilizador
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{sjiam}}/api/users/{{username}}/groups
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.body: isArray
+}
+
+tests {
+  test("utilizador pertence ao grupo " + bru.getEnvVar("group"), function () {
+    expect(res.body).to.include("/" + bru.getEnvVar("group"));
+  });
+}

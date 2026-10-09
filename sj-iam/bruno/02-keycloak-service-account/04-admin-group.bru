@@ -1,0 +1,33 @@
+meta {
+  name: 04 Admin API (SA): grupo
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{keycloak}}/admin/realms/{{realm}}/groups?search={{group}}&exact=true
+  body: none
+  auth: bearer
+}
+
+params:query {
+  search: {{group}}
+  exact: true
+}
+
+auth:bearer {
+  token: {{saToken}}
+}
+
+vars:post-response {
+  groupId: res.body[0].id
+}
+
+assert {
+  res.status: eq 200
+  res.body[0].name: eq {{group}}
+}
+
+docs {
+  Precisa de `query-groups`, que vem no composite `view-users`. Guarda `groupId`.
+}

@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "sj-iam",
+      "runtimeExecutable": "./sj-iam/scripts/run-local.sh",
+      "runtimeArgs": [],
+      "port": 8081
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+meta {
+  name: 05 Admin API (SA): adicionar ao grupo
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{keycloak}}/admin/realms/{{realm}}/users/{{userId}}/groups/{{groupId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{saToken}}
+}
+
+assert {
+  res.status: eq 204
+}
+
+docs {
+  Precisa de `manage-users`. É idempotente: repetir devolve 204 na mesma.
+}

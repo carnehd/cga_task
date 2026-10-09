@@ -1,0 +1,9 @@
+# USAR CODIGO: configuração dos testes migrados (ajustar o diretório dos secrets de teste).
+sjiam:
+  secrets:
+    provider: file
+    file:
+      directory: src/test/resources/secrets
+  keycloak:
+    base-url: http://keycloak.test:8080
+    realm: CGA

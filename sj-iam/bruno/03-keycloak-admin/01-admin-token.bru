@@ -1,0 +1,27 @@
+meta {
+  name: 01 Admin token (master)
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{keycloak}}/realms/master/protocol/openid-connect/token
+  body: formUrlEncoded
+  auth: none
+}
+
+body:form-urlencoded {
+  grant_type: password
+  client_id: admin-cli
+  username: {{adminUser}}
+  password: {{adminPassword}}
+}
+
+vars:post-response {
+  adminToken: res.body.access_token
+}
+
+assert {
+  res.status: eq 200
+  res.body.access_token: isDefined
+}

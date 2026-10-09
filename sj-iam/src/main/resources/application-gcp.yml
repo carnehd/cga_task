@@ -1,0 +1,12 @@
+# USAR CODIGO: perfil GCP (provider=gcp + URL do Keycloak por variáveis de ambiente).
+# Perfil para GCP: ativar com SPRING_PROFILES_ACTIVE=gcp.
+# A autenticação no Secret Manager usa Application Default Credentials
+# (service account do workload no GKE / Cloud Run).
+sjiam:
+  secrets:
+    provider: gcp
+    gcp:
+      project-id: ${GCP_PROJECT_ID}
+  keycloak:
+    base-url: ${KEYCLOAK_BASE_URL}
+    realm: ${KEYCLOAK_REALM:CGA}

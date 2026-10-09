@@ -1,0 +1,48 @@
+meta {
+  name: JWKS (tarefa 1)
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{sjiam}}/.well-known/jwks.json
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
+
+vars:post-response {
+  kid: res.body.keys[0].kid
+}
+
+assert {
+  res.status: eq 200
+  res.body.keys: length 1
+  res.body.keys[0].kty: eq RSA
+  res.body.keys[0].use: eq sig
+  res.body.keys[0].alg: eq RS256
+  res.body.keys[0].e: eq AQAB
+  res.body.keys[0].kid: isDefined
+  res.body.keys[0].n: isDefined
+  res.body.keys[0].d: isUndefined
+  res.body.keys[0].p: isUndefined
+  res.body.keys[0].q: isUndefined
+}
+
+tests {
+  test("resposta cacheável durante 1 hora", function () {
+    expect(res.getHeader("cache-control")).to.contain("max-age=3600");
+  });
+  test("kid segue o formato iamsj-YYYY-MM", function () {
+    expect(res.body.keys[0].kid).to.match(/^iamsj-\d{4}-\d{2}$/);
+  });
+}
+
+docs {
+  Chave pública publicada pelo sj-iam. É este URL que o cliente `iamsj` no Keycloak
+  tem configurado em **Keys → JWKS URL** (localmente via `host.docker.internal`).
+  Nunca pode conter os campos privados (`d`, `p`, `q`, `dp`, `dq`, `qi`).
+}

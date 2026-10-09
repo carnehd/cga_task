@@ -1,0 +1,27 @@
+meta {
+  name: 02 Token com assertion inválida (invalid_client)
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{keycloak}}/realms/{{realm}}/protocol/openid-connect/token
+  body: formUrlEncoded
+  auth: none
+}
+
+body:form-urlencoded {
+  grant_type: client_credentials
+  client_id: {{clientId}}
+  client_assertion_type: urn:ietf:params:oauth:client-assertion-type:jwt-bearer
+  client_assertion: eyJhbGciOiJSUzI1NiJ9.e30.invalid
+}
+
+assert {
+  res.status: in [400, 401]
+  res.body.error: eq invalid_client
+}
+
+docs {
+  Prova que o Keycloak exige uma assertion assinada com a chave publicada no JWKS.
+}

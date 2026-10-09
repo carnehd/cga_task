@@ -1,0 +1,35 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: sj-iam
+
+# USAR CODIGO: bloco sjiam a migrar para a configuração do sj-iam real (server/management/logging são locais).
+sjiam:
+  secrets:
+    # file: lê ./secrets/<nome> (equivalente local ao Google Secret Manager)
+    # gcp:  lê projects/<project-id>/secrets/<nome>/versions/latest
+    provider: file
+    key-secret-name: iamsj_client_auth
+    kid-secret-name: iamsj_client_auth_kid
+    file:
+      directory: ./secrets
+    gcp:
+      project-id: ${GCP_PROJECT_ID:}
+  keycloak:
+    base-url: ${KEYCLOAK_BASE_URL:http://localhost:8180}
+    realm: ${KEYCLOAK_REALM:CGA}
+    client-id: iamsj
+    assertion-ttl: 60s
+    token-refresh-skew: 30s
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+logging:
+  level:
+    pt.cga.sjiam: INFO

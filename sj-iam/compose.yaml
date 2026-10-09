@@ -1,0 +1,19 @@
+# APENAS TESTES LOCAIS
+# Keycloak local, equivalente ao ambiente da tarefa 2.
+# O realm CGA e o cliente iamsj são importados de keycloak/realm-cga.json.
+# Porta 8180 no host (8080 costuma estar ocupada). O sj-iam corre no host (porta 8081)
+# e o Keycloak chega-lhe por host.docker.internal,
+# que aqui faz o papel do Apigee interno.
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:${KEYCLOAK_VERSION:-26.8}
+    command: start-dev --import-realm
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+    ports:
+      - "8180:8080"
+    volumes:
+      - ./keycloak:/opt/keycloak/data/import:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

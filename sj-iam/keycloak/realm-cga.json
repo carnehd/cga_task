@@ -1,0 +1,73 @@
+{
+  "realm": "CGA",
+  "enabled": true,
+  "displayName": "CGA (local)",
+  "sslRequired": "none",
+  "accessTokenLifespan": 300,
+  "groups": [
+    {
+      "name": "sj-users"
+    },
+    {
+      "name": "sj-admins"
+    }
+  ],
+  "users": [
+    {
+      "username": "alice",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "alice@example.test",
+      "firstName": "Alice",
+      "lastName": "Exemplo"
+    },
+    {
+      "username": "service-account-iamsj",
+      "enabled": true,
+      "serviceAccountClientId": "iamsj",
+      "clientRoles": {
+        "realm-management": [
+          "manage-users",
+          "query-users",
+          "view-users"
+        ]
+      }
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "iamsj",
+      "name": "IAM SJ",
+      "description": "Service account do sj-iam (tarefa 2): autenticação por JWT assinado, chave pública lida do JWKS do sj-iam.",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "bearerOnly": false,
+      "clientAuthenticatorType": "client-jwt",
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "authorizationServicesEnabled": false,
+      "fullScopeAllowed": false,
+      "attributes": {
+        "use.jwks.url": "true",
+        "jwks.url": "http://host.docker.internal:8081/.well-known/jwks.json",
+        "token.endpoint.auth.signing.alg": "RS256",
+        "oauth2.device.authorization.grant.enabled": "true"
+      }
+    }
+  ],
+  "clientScopeMappings": {
+    "realm-management": [
+      {
+        "client": "iamsj",
+        "roles": [
+          "manage-users",
+          "query-users",
+          "view-users"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,20 @@
+meta {
+  name: 07 Admin API sem token (401)
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{keycloak}}/admin/realms/{{realm}}/users?username={{username}}&exact=true
+  body: none
+  auth: none
+}
+
+params:query {
+  username: {{username}}
+  exact: true
+}
+
+assert {
+  res.status: eq 401
+}

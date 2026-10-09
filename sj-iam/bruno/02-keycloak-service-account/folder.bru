@@ -1,0 +1,13 @@
+meta {
+  name: 02 Keycloak: service account
+  seq: 2
+}
+
+docs {
+  O que o sj-iam faz por dentro (tarefa 3), pedido a pedido:
+  1. gera e assina a client assertion com a chave privada local;
+  2. troca-a por um access token no token endpoint;
+  3. usa o token na Admin API (com as roles manage-users / query-users / view-users).
+  
+  O pedido 01 precisa do **Developer Mode** nos scripts (usa `crypto`, `fs` e `path` do Node).
+}

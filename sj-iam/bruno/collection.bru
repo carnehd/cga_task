@@ -1,0 +1,23 @@
+docs {
+  # sj-iam — coleção Bruno
+  
+  Pedidos individuais para testar as tarefas 1, 2 e 3 contra o ambiente local
+  (`docker compose up -d` + `./scripts/run-local.sh`). Seleciona o ambiente **local**.
+  
+  ## Pastas
+  
+  1. **sj-iam** — JWKS (tarefa 1) e API de demonstração que usa a service account (tarefa 3).
+  2. **Keycloak: service account** — o que o sj-iam faz por dentro: gera a client assertion,
+     pede o token ao Keycloak e chama a Admin API com ele. O pedido *Token com client assertion*
+     assina o JWT com a chave em `secretsDir` (por omissão `../secrets`, relativo à coleção).
+     Precisa do **Developer Mode** nos scripts (Collection settings → Script → Developer Mode),
+     porque usa `crypto` e `fs` do Node.
+  3. **Keycloak: admin** — verificação da tarefa 2 com o admin do Keycloak local
+     (`admin` / `admin`, definido no `compose.yaml`).
+  
+  ## Ordem
+  
+  Dentro de cada pasta os pedidos estão numerados; os que dependem de outros guardam variáveis
+  (`saToken`, `userId`, `groupId`, `adminToken`, ...) via `vars:post-response`. Correr a pasta
+  inteira (Run folder) executa-os pela ordem certa.
+}

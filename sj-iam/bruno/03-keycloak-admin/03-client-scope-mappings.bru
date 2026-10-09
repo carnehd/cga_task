@@ -1,0 +1,31 @@
+meta {
+  name: 03 Scope mappings do cliente
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{keycloak}}/admin/realms/{{realm}}/clients/{{iamsjClientUuid}}/scope-mappings
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("as roles do realm-management entram no token do cliente", function () {
+    const names = res.body.clientMappings["realm-management"].mappings.map(m => m.name);
+    expect(names).to.include.members(["manage-users", "query-users", "view-users"]);
+  });
+}
+
+docs {
+  Substitui o *Full scope allowed* (deprecated no Keycloak 26.8): sem este mapping, o access
+  token da service account não traz as roles e a Admin API responde 403.
+}

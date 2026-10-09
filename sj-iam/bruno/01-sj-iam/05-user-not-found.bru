@@ -1,0 +1,17 @@
+meta {
+  name: Utilizador inexistente (404)
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{sjiam}}/api/users/nao-existe/groups
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 404
+  res.body.title: eq Not Found
+  res.body.detail: contains nao-existe
+}

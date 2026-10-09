@@ -1,0 +1,19 @@
+meta {
+  name: Caminho fechado (403)
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{sjiam}}/.well-known/openid-configuration
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 403
+}
+
+docs {
+  Só o JWKS, o health e a API interna estão abertos; tudo o resto é negado pelo Spring Security.
+}

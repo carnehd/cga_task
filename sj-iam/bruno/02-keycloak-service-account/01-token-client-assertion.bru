@@ -1,0 +1,80 @@
+meta {
+  name: 01 Token com client assertion
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{keycloak}}/realms/{{realm}}/protocol/openid-connect/token
+  body: formUrlEncoded
+  auth: none
+}
+
+body:form-urlencoded {
+  grant_type: client_credentials
+  client_id: {{clientId}}
+  client_assertion_type: urn:ietf:params:oauth:client-assertion-type:jwt-bearer
+  client_assertion: {{clientAssertion}}
+}
+
+vars:post-response {
+  saToken: res.body.access_token
+}
+
+assert {
+  res.status: eq 200
+  res.body.access_token: isDefined
+  res.body.token_type: eq Bearer
+  res.body.expires_in: gt 0
+}
+
+script:pre-request {
+  // Constrói a client assertion (RFC 7523) tal como o ClientAssertionFactory do sj-iam:
+  // header { alg: RS256, typ: JWT, kid } e claims { iss, sub, aud, jti, iat, exp }.
+  const crypto = require("crypto");
+  const fs = require("fs");
+  const path = require("path");
+  
+  const base = typeof bru.cwd === "function" ? bru.cwd() : process.cwd();
+  const secretsDir = path.resolve(base, bru.getEnvVar("secretsDir"));
+  const pem = fs.readFileSync(path.join(secretsDir, "iamsj_client_auth"), "utf8");
+  const kid = fs.readFileSync(path.join(secretsDir, "iamsj_client_auth_kid"), "utf8").trim();
+  
+  const clientId = bru.getEnvVar("clientId");
+  const tokenEndpoint = `${bru.getEnvVar("keycloak")}/realms/${bru.getEnvVar("realm")}/protocol/openid-connect/token`;
+  const now = Math.floor(Date.now() / 1000);
+  
+  const b64url = (input) => Buffer.from(input).toString("base64url");
+  const header = { alg: "RS256", typ: "JWT", kid };
+  const claims = { iss: clientId, sub: clientId, aud: tokenEndpoint, jti: crypto.randomUUID(), iat: now, exp: now + 60 };
+  const signingInput = `${b64url(JSON.stringify(header))}.${b64url(JSON.stringify(claims))}`;
+  const signature = crypto.sign("sha256", Buffer.from(signingInput), { key: pem });
+  
+  bru.setVar("clientAssertion", `${signingInput}.${b64url(signature)}`);
+  bru.setVar("assertionKid", kid);
+}
+
+script:post-response {
+  // Descodifica o access token para ver as roles que o Keycloak colocou no token.
+  if (res.getStatus() === 200) {
+    const payload = JSON.parse(atob(res.body.access_token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
+    bru.setVar("saTokenPayload", JSON.stringify(payload, null, 2));
+    console.log("azp:", payload.azp, "| realm-management roles:", payload.resource_access?.["realm-management"]?.roles);
+  }
+}
+
+tests {
+  test("o access token traz as roles do realm-management", function () {
+    const payload = JSON.parse(atob(res.body.access_token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
+    const roles = payload.resource_access["realm-management"].roles;
+    expect(roles).to.include.members(["manage-users", "query-users", "view-users"]);
+  });
+}
+
+docs {
+  Equivalente ao `curl` da tarefa 3. A assertion é assinada no pre-request script com a chave
+  de `{{secretsDir}}/iamsj_client_auth` e o `kid` de `{{secretsDir}}/iamsj_client_auth_kid`.
+  O Keycloak valida a assinatura indo buscar a chave pública ao JWKS do sj-iam (tarefa 1).
+  
+  Guarda o token em `saToken`, usado pelos pedidos seguintes desta pasta.
+}
